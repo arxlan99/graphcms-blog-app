@@ -65,6 +65,6 @@
     "tailwindcss": "^3.1.8"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json}": "eslint \"./src/**/*.{js,jsx,ts,tsx,json}\"  --no-fix --max-warnings 0"
+    "*.{js,jsx,ts,tsx,json}": "eslint --no-fix --max-warnings 0"
   }
 }
