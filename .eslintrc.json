@@ -37,6 +37,9 @@
     ],
     "@typescript-eslint/no-unused-vars": "warn",
     "react/function-component-definition": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "react/no-array-index-key": "off",
+    "react/style-prop-object": "off",
+    "jsx-a11y/label-has-associated-control": "off"
   }
 }
