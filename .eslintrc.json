@@ -40,6 +40,7 @@
     "react/react-in-jsx-scope": "off",
     "react/no-array-index-key": "off",
     "react/style-prop-object": "off",
-    "jsx-a11y/label-has-associated-control": "off"
+    "jsx-a11y/label-has-associated-control": "off",
+    "no-unneeded-ternary": "off"
   }
 }

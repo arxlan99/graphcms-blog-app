@@ -1,48 +1,68 @@
 import React, { useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import toast, { Toaster } from 'react-hot-toast';
+import { Link, useParams } from 'react-router-dom';
 
-const ADD_NEWS = gql`
-  mutation AddNews($title: String!, $post: String!, $background: String!) {
-    createNewscast(data: { title: $title, post: $post, background: $background }) {
+const UPDATE_NEWS = gql`
+  mutation updateNews($id: ID, $title: String!, $post: String!, $background: String!) {
+    updateNewscast(
+      where: { id: $id }
+      data: { title: $title, post: $post, background: $background }
+    ) {
       id
     }
   }
 `;
 
-const PUBLISH_NEWS = gql`
-  mutation PublishNews($id: ID!) {
-    publishNewscast(where: { id: $id }) {
+const GET_NEWS_DETAIL = gql`
+  query getNew($id: ID!) {
+    newscast(where: { id: $id }) {
       id
+      background
+      title
+      post
     }
   }
 `;
 
-const AddNew = () => {
-  const [publishNews, { loading: loadingPublish, error: errorPublish }] = useMutation(PUBLISH_NEWS);
+const UpdateNews = () => {
+  const { id } = useParams();
+  const [updateNews, { loading, error }] = useMutation(UPDATE_NEWS);
 
-  const [addNews, { loading, error }] = useMutation(ADD_NEWS, {
-    onCompleted: (myData) => {
-      publishNews({ variables: { id: myData.createNewscast.id } });
-    },
-  });
-
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState<string>('');
   const [post, setPost] = useState('');
   const [background, setBackground] = useState('');
 
+  const { loading: loadingNewsDetail, error: errorNewsDetail } = useQuery(GET_NEWS_DETAIL, {
+    variables: { id },
+    onCompleted: (comingData) => {
+      setTitle(comingData?.newscast.title);
+      setPost(comingData?.newscast.post);
+      setBackground(comingData?.newscast.background);
+    },
+  });
+
   const handleSend = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    addNews({ variables: { title, post, background } }).then(() => {
-      setTitle('');
-      setPost('');
-      setBackground('');
-      toast.success('News added successfully!');
+    updateNews({
+      variables: {
+        id,
+        title,
+        post,
+        background,
+      },
+    }).then(() => {
+      toast.success('News updated successfully!');
     });
   };
 
-  if (error) return <div>Submission error! {error.message}</div>;
-  if (errorPublish) return <div>Publish error! {errorPublish.message}</div>;
+  if (loadingNewsDetail) return <div>Loading...</div>;
+  if (errorNewsDetail) {
+    return <div>Error! {errorNewsDetail.message}</div>;
+  }
+  if (error) {
+    return <div> {error.message}</div>;
+  }
 
   return (
     <div className='flex justify-center items-center py-8 '>
@@ -52,7 +72,14 @@ const AddNew = () => {
 
       <form className='w-full lg:w-1/2 p-5 lg:p-0'>
         <div>
-          <div className='font-semibold text-2xl mb-5'>Add News</div>
+          <div className='font-semibold text-2xl mb-5'>Update News</div>
+          <div className='mb-4'>
+            <button type='button'>
+              <Link to={`/news/${id}`} className='underline'>
+                {'<'} Back
+              </Link>
+            </button>
+          </div>
           <div className='flex flex-col gap-8'>
             <div>
               <label htmlFor='first_name' className='block mb-2 text-sm font-medium text-gray-900 '>
@@ -324,7 +351,7 @@ const AddNew = () => {
                   />
                 </div>
               </div>
-              {loading || loadingPublish ? (
+              {loading ? (
                 <div>Sending...</div>
               ) : (
                 <button
@@ -343,4 +370,4 @@ const AddNew = () => {
   );
 };
 
-export default AddNew;
+export default UpdateNews;

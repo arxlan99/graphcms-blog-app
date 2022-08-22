@@ -1,18 +1,22 @@
 import React from 'react';
-import bg from 'assets/images/news-background.png';
 import { Link } from 'react-router-dom';
 
-const NewsCard = () => {
-  const id = Math.floor(Math.random() * 100);
+type Props = {
+  id: number;
+  title: string;
+  background: string | null;
+};
+
+const NewsCard = (props: Props) => {
+  const { id, title, background } = props;
+
   return (
-    <div className='w-80 flex flex-col justify-center items-center'>
+    <div className='w-80 flex flex-col justify-center items-center '>
       <Link to={`/news/${id}`}>
-        <div>
-          <img src={bg} alt='alt' />
+        <div className='min-h-[200px]'>
+          <img src={background ? background : ''} alt='alt' />
         </div>
-        <div className='text-center font-semibold text-xl'>
-          Here are some things you should know regarding how we work
-        </div>
+        <div className='text-center font-semibold text-xl'>{title}</div>
       </Link>
     </div>
   );
