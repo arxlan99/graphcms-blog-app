@@ -25,9 +25,23 @@ const GET_NEWS_DETAIL = gql`
   }
 `;
 
+const PUBLISH_NEWS = gql`
+  mutation PublishNews($id: ID!) {
+    publishNewscast(where: { id: $id }) {
+      id
+    }
+  }
+`;
+
 const UpdateNews = () => {
+  const [publishNews, { loading: loadingPublish, error: errorPublish }] = useMutation(PUBLISH_NEWS);
+
   const { id } = useParams();
-  const [updateNews, { loading, error }] = useMutation(UPDATE_NEWS);
+  const [updateNews, { loading, error }] = useMutation(UPDATE_NEWS, {
+    onCompleted: (myData) => {
+      publishNews({ variables: { id: myData.updateNewscast.id } });
+    },
+  });
 
   const [title, setTitle] = useState<string>('');
   const [post, setPost] = useState('');
@@ -62,6 +76,10 @@ const UpdateNews = () => {
   }
   if (error) {
     return <div> {error.message}</div>;
+  }
+
+  if (errorPublish) {
+    return <div>{errorPublish.message}</div>;
   }
 
   return (
@@ -351,7 +369,7 @@ const UpdateNews = () => {
                   />
                 </div>
               </div>
-              {loading ? (
+              {loading || loadingPublish ? (
                 <div>Sending...</div>
               ) : (
                 <button
